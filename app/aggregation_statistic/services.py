@@ -154,7 +154,6 @@ class AggregationOfStatisticalData:
         }
 
         all_labels = self._generate_labels(dt_from, dt_upto, group_format, data.group_type)
-        print(all_labels)
         pipeline = self._build_pipeline(dt_from, dt_upto, group_format, data.group_type)
         result = self._aggregate_data(pipeline)
         data_dict = self._fill_missing_values(result, all_labels)
