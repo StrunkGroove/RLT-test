@@ -15,3 +15,4 @@ Start with:
 ```
 docker-compose up --build -d
 ```
+PS: The base must be filled before use.
