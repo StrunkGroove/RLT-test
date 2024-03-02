@@ -24,7 +24,8 @@ class AggregationOfStatisticalData:
         db = client.mydatabase
         self.collection = db.sample_collection
 
-    def _generate_labels(self, dt_from: datetime, dt_upto: datetime,
+    @staticmethod
+    def _generate_labels(dt_from: datetime, dt_upto: datetime,
                          group_format: dict[GroupType, str],
                          group_type: str) -> list[str]:
         """
@@ -48,7 +49,8 @@ class AggregationOfStatisticalData:
                           relativedelta(months=1)
         return all_labels
 
-    def _build_pipeline(self, dt_from: datetime, dt_upto: datetime,
+    @staticmethod
+    def _build_pipeline(dt_from: datetime, dt_upto: datetime,
                         group_format: dict[GroupType, str],
                         group_type: str) -> list[dict]:
         """
@@ -100,8 +102,9 @@ class AggregationOfStatisticalData:
         """
         result = list(self.collection.aggregate(pipeline))
         return result
-
-    def _fill_missing_values(self, result: list[dict], 
+    
+    @staticmethod
+    def _fill_missing_values(result: list[dict], 
                              all_labels: list[str]) -> dict[str, int]:
         """
         Fills missing values in the aggregated data.
@@ -119,7 +122,8 @@ class AggregationOfStatisticalData:
                 data_dict[label] = 0
         return data_dict
 
-    def _sort_data(self, data_dict: dict[str, int],
+    @staticmethod
+    def _sort_data(data_dict: dict[str, int],
                    all_labels: list[str]) -> list[int]:
         """
         Sorts aggregated data.
