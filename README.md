@@ -4,13 +4,14 @@
 ```
 git clone https://github.com/StrunkGroove/RLT-test.git
 ```
-Edit .env ans set ...
+cd RLT-test/
+```
+```
+Edit .env and set ...
 ```
 BOT_TOKEN=<your token bot>
 ```
-```
-cd RLT-test/
-```
+Start with: 
 ```
 docker-compose up --build -d
 ```
