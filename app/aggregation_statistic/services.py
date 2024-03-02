@@ -2,6 +2,8 @@ from datetime import datetime, timedelta
 
 import pymongo
 
+from dateutil.relativedelta import relativedelta
+
 from .schemas import InputData, GroupType
 
 
@@ -43,7 +45,9 @@ class AggregationOfStatisticalData:
             all_labels.append(current_dt.strftime(group_format[group_type]))
             current_dt += timedelta(hours=1) if group_type == GroupType.hour else \
                           timedelta(days=1) if group_type == GroupType.day else \
-                          timedelta(days=30)
+                          relativedelta(months=1)
+            print(current_dt)
+            
         return all_labels
 
     def _build_pipeline(self, dt_from: datetime, dt_upto: datetime,
@@ -147,11 +151,12 @@ class AggregationOfStatisticalData:
 
         group_format = {
             GroupType.hour: "%Y-%m-%dT%H:00:00",
-            GroupType.day: "%Y-%m-%dT%H:00:00",
-            GroupType.month: "%Y-%m-01T%H:00:00",
+            GroupType.day: "%Y-%m-%dT00:00:00",
+            GroupType.month: "%Y-%m-01T00:00:00",
         }
 
         all_labels = self._generate_labels(dt_from, dt_upto, group_format, data.group_type)
+        print(all_labels)
         pipeline = self._build_pipeline(dt_from, dt_upto, group_format, data.group_type)
         result = self._aggregate_data(pipeline)
         data_dict = self._fill_missing_values(result, all_labels)
