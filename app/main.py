@@ -5,7 +5,7 @@ from os import getenv
 
 from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
-from handlers import aggregation, command_start_handler
+from aggregation_statistic import handler as aggregation_statistic_handler
 
 TOKEN = getenv("BOT_TOKEN")
 
@@ -14,7 +14,9 @@ dp = Dispatcher()
 
 async def main() -> None:
     bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
-    dp.include_routers(command_start_handler.router, aggregation.router)
+    dp.include_routers(
+        aggregation_statistic_handler.router
+    )
     await dp.start_polling(bot)
 
 

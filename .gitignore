@@ -1,3 +1,4 @@
 dump/
 .env
 db/
+__pycache__/
