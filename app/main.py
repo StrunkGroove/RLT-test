@@ -1,100 +1,45 @@
-import json
-from datetime import datetime, timedelta
-from enum import Enum
-import pymongo
-from pydantic import BaseModel
+import asyncio
+import logging
+import sys
+from os import getenv
+
+from aiogram import Bot, Dispatcher, Router, types
+from aiogram.enums import ParseMode
+from aiogram.filters import CommandStart
+from aiogram.types import Message
+from aiogram.utils.markdown import hbold
+
+TOKEN = getenv("BOT_TOKEN")
+
+dp = Dispatcher()
 
 
-class GroupType(str, Enum):
-    hour = "hour"
-    day = "day"
-    month = "month"
+@dp.message(CommandStart())
+async def command_start_handler(message: Message) -> None:
+    """
+    This handler receives messages with `/start` command
+    """
+    await message.answer(f"Hello, {hbold(message.from_user.full_name)}!")
 
 
-class InputData(BaseModel):
-    dt_from: str
-    dt_upto: str
-    group_type: GroupType
+@dp.message()
+async def echo_handler(message: types.Message) -> None:
+    """
+    Handler will forward receive a message back to the sender
+
+    By default, message handler will handle all message types (like a text, photo, sticker etc.)
+    """
+    try:
+        await message.send_copy(chat_id=message.chat.id)
+    except TypeError:
+        await message.answer("Nice try!")
 
 
-data = {
-   "dt_from": "2022-09-01T00:00:00",
-   "dt_upto": "2022-12-31T23:59:00",
-   "group_type": "month"
-}
-# data ={
-#    "dt_from": "2022-10-01T00:00:00",
-#    "dt_upto": "2022-11-30T23:59:00",
-#    "group_type": "day"
-# }
-# data = {
-#    "dt_from": "2022-02-01T00:00:00",
-#    "dt_upto": "2022-02-02T00:00:00",
-#    "group_type": "hour"
-# }
+async def main() -> None:
+    bot = Bot(TOKEN, parse_mode=ParseMode.HTML)
+    await dp.start_polling(bot)
 
 
-class AggregationOfStatisticalData:
-    def __init__(self):
-        client = pymongo.MongoClient("mongodb://mongodb:27017/")
-        db = client.mydatabase
-        self.collection = db.sample_collection
-
-    def main(self, data: InputData):
-        dt_from = datetime.fromisoformat(data.dt_from)
-        dt_upto = datetime.fromisoformat(data.dt_upto)
-
-        group_format = {
-            GroupType.hour: "%Y-%m-%dT%H:00:00",
-            GroupType.day: "%Y-%m-%d",
-            GroupType.month: "%Y-%m-01",
-        }
-
-        current_dt = dt_from
-        all_labels = []
-        while current_dt <= dt_upto:
-            all_labels.append(current_dt.strftime(group_format[data.group_type]))
-            current_dt += timedelta(hours=1) if data.group_type == GroupType.hour else \
-                          timedelta(days=1) if data.group_type == GroupType.day else \
-                          timedelta(days=30)
-
-        pipeline = [
-            {
-                "$match": {
-                    "dt": {"$gte": dt_from, "$lte": dt_upto}
-                }
-            },
-            {
-                "$group": {
-                    "_id": {
-                        "$dateToString": {
-                            "format": group_format[data.group_type],
-                            "date": "$dt"
-                        }
-                    },
-                    "total_value": {"$sum": "$value"}
-                }
-            },
-            {
-                "$sort": {
-                    "_id": 1
-                }
-            }
-        ]
-
-        result = list(self.collection.aggregate(pipeline))
-
-        data_dict = {item["_id"]: item["total_value"] for item in result}
-
-        for label in all_labels:
-            if label not in data_dict:
-                data_dict[label] = 0
-
-        sorted_data = [data_dict[label] for label in all_labels]
-
-        response = {"dataset": sorted_data, "labels": all_labels}
-
-        print(json.dumps(response))
-
-agg_data = AggregationOfStatisticalData()
-agg_data.main(InputData(**data))
+if __name__ == "__main__":
+    logging.basicConfig(level=logging.INFO, stream=sys.stdout)
+    asyncio.run(main())

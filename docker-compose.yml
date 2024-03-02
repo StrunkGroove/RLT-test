@@ -19,6 +19,8 @@ services:
     command: python main.py
     networks:
       - tg-bot-network
+    env_file:
+      - .env
 
 networks:
   tg-bot-network:
