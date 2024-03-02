@@ -4,8 +4,8 @@
 ```
 git clone https://github.com/StrunkGroove/RLT-test.git
 ```
-cd RLT-test/
 ```
+cd RLT-test/
 ```
 Edit .env and set ...
 ```
