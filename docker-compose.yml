@@ -7,6 +7,7 @@ services:
     ports:
       - 27017:27017
     volumes:
+      - ./dump:/dump
       - ./db/mongodb:/data/db
     networks:
       - tg-bot-network
