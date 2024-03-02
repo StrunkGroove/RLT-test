@@ -1,40 +1,7 @@
-import json
-
 from datetime import datetime, timedelta
-from enum import Enum
+from .schemas import InputData, GroupType
 
 import pymongo
-
-from pydantic import BaseModel
-
-
-class GroupType(str, Enum):
-    hour = "hour"
-    day = "day"
-    month = "month"
-
-
-class InputData(BaseModel):
-    dt_from: str
-    dt_upto: str
-    group_type: GroupType
-
-
-data = {
-   "dt_from": "2022-09-01T00:00:00",
-   "dt_upto": "2022-12-31T23:59:00",
-   "group_type": "month"
-}
-# data ={
-#    "dt_from": "2022-10-01T00:00:00",
-#    "dt_upto": "2022-11-30T23:59:00",
-#    "group_type": "day"
-# }
-# data = {
-#    "dt_from": "2022-02-01T00:00:00",
-#    "dt_upto": "2022-02-02T00:00:00",
-#    "group_type": "hour"
-# }
 
 
 class AggregationOfStatisticalData:
@@ -43,7 +10,7 @@ class AggregationOfStatisticalData:
         db = client.mydatabase
         self.collection = db.sample_collection
 
-    def main(self, data: InputData):
+    def main(self, data: InputData) -> str:
         dt_from = datetime.fromisoformat(data.dt_from)
         dt_upto = datetime.fromisoformat(data.dt_upto)
 
@@ -96,8 +63,5 @@ class AggregationOfStatisticalData:
         sorted_data = [data_dict[label] for label in all_labels]
 
         response = {"dataset": sorted_data, "labels": all_labels}
+        return str(response)
 
-        print(json.dumps(response))
-
-agg_data = AggregationOfStatisticalData()
-agg_data.main(InputData(**data))
