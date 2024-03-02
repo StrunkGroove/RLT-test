@@ -46,8 +46,6 @@ class AggregationOfStatisticalData:
             current_dt += timedelta(hours=1) if group_type == GroupType.hour else \
                           timedelta(days=1) if group_type == GroupType.day else \
                           relativedelta(months=1)
-            print(current_dt)
-            
         return all_labels
 
     def _build_pipeline(self, dt_from: datetime, dt_upto: datetime,
