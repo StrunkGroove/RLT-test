@@ -164,5 +164,5 @@ class AggregationOfStatisticalData:
         sorted_data = self._sort_data(data_dict, all_labels)
 
         response = {"dataset": sorted_data, "labels": all_labels}
-        return str(response)
+        return str(response).replace("'", '"')
 
