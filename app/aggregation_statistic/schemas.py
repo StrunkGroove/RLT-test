@@ -1,6 +1,7 @@
+from datetime import datetime
 from enum import Enum
 
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 
 
 class GroupType(str, Enum):
@@ -19,3 +20,7 @@ class InputData(BaseModel):
     dt_from: str
     dt_upto: str
     group_type: GroupType
+
+    @validator('dt_from', 'dt_upto')
+    def validate_datetime(cls, value):
+        return datetime.fromisoformat(value)

@@ -23,6 +23,11 @@ class AggregationOfStatisticalData:
         client = pymongo.MongoClient("mongodb://mongodb:27017/")
         db = client.mydatabase
         self.collection = db.sample_collection
+        self.group_format = {
+            GroupType.hour: "%Y-%m-%dT%H:00:00",
+            GroupType.day: "%Y-%m-%dT00:00:00",
+            GroupType.month: "%Y-%m-01T00:00:00",
+        }
 
     @staticmethod
     def _generate_labels(dt_from: datetime, dt_upto: datetime,
@@ -148,17 +153,12 @@ class AggregationOfStatisticalData:
         Returns:
             JSON string containing aggregated data.
         """
-        dt_from = datetime.fromisoformat(data.dt_from)
-        dt_upto = datetime.fromisoformat(data.dt_upto)
-
-        group_format = {
-            GroupType.hour: "%Y-%m-%dT%H:00:00",
-            GroupType.day: "%Y-%m-%dT00:00:00",
-            GroupType.month: "%Y-%m-01T00:00:00",
-        }
-
-        all_labels = self._generate_labels(dt_from, dt_upto, group_format, data.group_type)
-        pipeline = self._build_pipeline(dt_from, dt_upto, group_format, data.group_type)
+        all_labels = self._generate_labels(
+            data.dt_from, data.dt_upto, self.group_format, data.group_type
+        )
+        pipeline = self._build_pipeline(
+            data.dt_from, data.dt_upto, self.group_format, data.group_type
+        )
         result = self._aggregate_data(pipeline)
         data_dict = self._fill_missing_values(result, all_labels)
         sorted_data = self._sort_data(data_dict, all_labels)
