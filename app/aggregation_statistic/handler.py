@@ -12,9 +12,8 @@ router = Router()
 @router.message()
 async def aggregation_of_statistical_data(message: types.Message) -> None:
     """
-    Handles incoming messages by forwarding them back to the sender.
-
     This handler parses incoming JSON data from the message and uses it to perform aggregation of statistical data.
+    
     :raises json.JSONDecodeError: if there's an error during JSON decoding.
     """
 
