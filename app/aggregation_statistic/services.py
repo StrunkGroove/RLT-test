@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta
 
 import pymongo
-
 from dateutil.relativedelta import relativedelta
 
 from .schemas import InputData, GroupType
